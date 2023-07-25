@@ -1,0 +1,11 @@
+{
+  "C_Cpp.errorSquiggles": "disabled",
+  "Lua.diagnostics.globals": [
+    "love"
+  ],
+  "Lua.diagnostics.disable": [
+    "undefined-global",
+    "duplicate-set-field",
+    "lowercase-global"
+  ]
+}
