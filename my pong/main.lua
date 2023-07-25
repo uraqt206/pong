@@ -1,6 +1,6 @@
 push = require 'push'
-class = require 'class'
-Paddle = require 'Paddle'
+Class = require 'class'
+require 'Paddle'
 
 
 function love.load() 
