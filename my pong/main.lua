@@ -1,6 +1,7 @@
 push = require 'push'
 Class = require 'class'
 require 'Paddle'
+require 'Ball'
 
 state = 'start'
 servingPlayer = 1;
@@ -16,23 +17,22 @@ function love.load()
   })
   startFont = love.graphics.newFont('font.ttf', 20)
   startFont2 = love.graphics.newFont('font.ttf', 10)
-  Paddle1 = Paddle(0, 0, 10, 30)
-  Paddle2 = Paddle(VIRTUE_WIDTH-10, VIRTUE_HEIGHT-30, 10, 30)
+  Player1 = Paddle(0, 0, 10, 30)
+  Player2 = Paddle(VIRTUE_WIDTH-10, VIRTUE_HEIGHT-30, 10, 30)
+  Ball = Ball(VIRTUE_WIDTH/2-2, VIRTUE_HEIGHT/2-2, 0, 0)
 end
 
 function love.keypressed(key) 
-  love.graphics.printf(tostring(key), 0, 0, VIRTUE_WIDTH, 'center')
   if key == 'return' then
     if (state == 'serving') then
       state = 'playing'
     end
-
+    
     if state == 'start' then
       state = 'serving'
     end
-
   end
-
+  
   if key == 'escape' then
     love.event.quit()
   end
@@ -50,14 +50,39 @@ function Serving()
   love.graphics.printf('Please press enter', 0, VIRTUE_HEIGHT/2+10, VIRTUE_WIDTH, 'center')
 end
 
-function love.draw()
-  push:apply('start');
+function love.update(dt) 
+  if love.keyboard.isDown('w') then
+    Player1.dy = -PADDLE_SPEED
+  elseif love.keyboard.isDown('s') then
+    Player1.dy = PADDLE_SPEED
+  else
+    Player1.dy = 0
+  end
+  
+  if love.keyboard.isDown('up') then
+    Player2.dy = -PADDLE_SPEED
+  elseif love.keyboard.isDown('down') then
+    Player2.dy = PADDLE_SPEED
+  else 
+    Player2.dy = 0
+  end
   
   if state ~= 'start' then
-    Paddle1:render()
-    Paddle2:render()
+    Player1:update(dt)
+    Player2:update(dt)
   end
+end
 
+function love.draw()
+  push:apply('start');
+
+  love.graphics.clear(40/255, 45/255, 52/255, 255/255)
+  
+  if state ~= 'start' then
+    Player1:render()
+    Player2:render()
+  end
+  
   if state == 'start' then
     StartGame()
   end
@@ -65,6 +90,10 @@ function love.draw()
   if state == 'serving' then
     Serving()
   end
-
+  
+  if state == 'playing' then
+    Ball:render()
+  end
+  
   push:apply('end');
 end
