@@ -2,18 +2,8 @@
 
 Paddle = Class {}
 
-VIRTUE_WIDTH, VIRTUE_HEIGHT = 432, 243
-WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
-
 function Paddle:init(_x, _y, _w, _h)
   self.x, self.y, self.width, self.height, self.dy = _x, _y, _w, _h, 0
-end
-
-function Paddle:up() 
-  self.y = self.y - 1
-  if self.y < 0 then
-    self.y = 0
-  end
 end
 
 function Paddle:update(dt) 
