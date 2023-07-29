@@ -9,6 +9,14 @@ function Ball:move(dt)
   self.y = self.y + self.dy * dt
 end
 
+function Ball:changeDy() 
+  if self.dy < 0 then
+    self.dy = math.random(10, 150) 
+  else
+    self.dy = -math.random(10, 150)
+  end
+end
+
 function Ball:render()
   love.graphics.rectangle('fill', self.x, self.y, BALL_SIZE, BALL_SIZE);  
 end

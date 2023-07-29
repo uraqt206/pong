@@ -5,9 +5,21 @@ require 'Ball'
 
 state = 'start'
 servingPlayer = 1
-PADDLE_SPEED = 150
+PADDLE_SPEED = 175
 BALL_SPEED = 200
 BALL_SIZE = 5
+
+function initFont() 
+  startFont = love.graphics.newFont('font.ttf', 16)
+  scoreFont = love.graphics.newFont('font.ttf', 48)
+  winFont = love.graphics.newFont('font.ttf', 32)
+end
+
+function initSound() 
+  hitWall = love.audio.newSource('sounds/wall_hit.wav', 'static')
+  hitPaddle = love.audio.newSource('sounds/paddle_hit.wav', 'static')
+  score = love.audio.newSource('sounds/score.wav', 'static')
+end
 
 function love.load() 
   VIRTUE_WIDTH, VIRTUE_HEIGHT = 432, 243
@@ -19,9 +31,8 @@ function love.load()
     resizable = true
   })
   math.randomseed(os.time())
-  startFont = love.graphics.newFont('font.ttf', 16)
-  scoreFont = love.graphics.newFont('font.ttf', 48)
-  winFont = love.graphics.newFont('font.ttf', 32)
+  initFont()
+  initSound()
   Player1 = Paddle(0, 0, 10, 40)
   Player2 = Paddle(VIRTUE_WIDTH-10, VIRTUE_HEIGHT-30, 10, 40)
   Player1Point = 0
@@ -35,10 +46,10 @@ function love.keypressed(key)
       state = 'playing'
       if servingPlayer == 1 then
         Ball.dx = BALL_SPEED
-        Ball.dy = math.random(-50, 50)
+        Ball.dy = math.random(-150, 150)
       else 
         Ball.dx = -BALL_SPEED
-        Ball.dy = math.random(-50, 50)
+        Ball.dy = math.random(-150, 150)
       end
     end
 
@@ -98,16 +109,19 @@ function love.update(dt)
     Ball:move(dt)
     
     if Player1:touch(Ball) then
+      hitPaddle:play()
       Ball.x = Player1.x + Player1.width + 1
       Ball.dx = -Ball.dx - Ball.dx * dt  
     end
 
     if Player2:touch(Ball) then
+      hitPaddle:play()
       Ball.x = Player2.x - BALL_SIZE - 1
       Ball.dx = -Ball.dx - Ball.dx * dt
     end
 
     if Ball.x <= 0 then
+      score:play()
       Player2Point = Player2Point + 1
       servingPlayer = 1
       Ball:init(VIRTUE_WIDTH/2-2, VIRTUE_HEIGHT/2-2, 0, 0)
@@ -121,6 +135,7 @@ function love.update(dt)
     end
 
     if Ball.x > VIRTUE_WIDTH then
+      score:play()
       Player1Point = Player1Point + 1
       servingPlayer = 2
       Ball:init(VIRTUE_WIDTH/2-2, VIRTUE_HEIGHT/2-2, 0, 0)
@@ -134,13 +149,15 @@ function love.update(dt)
     end
 
     if Ball.y <= 0 then
-      Ball.dy = -Ball.dy
-      Ball.y = -Ball.dy + -Ball.dy * dt
+      hitWall:play()
+      Ball:changeDy()
+      Ball.y = 1
     end
 
-    if Ball.y >= VIRTUE_HEIGHT then
-      Ball.dy = -Ball.dy + -Ball.dy * dt
-      Ball.y = VIRTUE_HEIGHT-1
+    if Ball.y >= VIRTUE_HEIGHT-4 then
+      hitWall:play()
+      Ball:changeDy()
+      Ball.y = VIRTUE_HEIGHT-5
     end
   end
 end
