@@ -17,13 +17,32 @@ function Paddle:up()
 end
 
 function Paddle:update(dt) 
-  if self.dy < 0 then
-    self.y = math.max(0, self.y + self.dy * dt)
-  elseif self.dy > 0 then
-    self.y = math.min(VIRTUE_HEIGHT - self.height, self.y + self.dy * dt)
+  if state ~= 'start' then
+    if self.dy < 0 then
+      self.y = math.max(0, self.y + self.dy * dt)
+    elseif self.dy > 0 then
+      self.y = math.min(VIRTUE_HEIGHT - self.height, self.y + self.dy * dt)
+    end
   end
 end
 
 function Paddle:render()
-  love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
+  if state ~= 'start' then
+    love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
+  end
 end 
+
+function Paddle:touch(Ball) 
+  if Ball.y + BALL_SIZE < self.y then 
+    return false
+  elseif Ball.y > self.y + self.height then
+    return false
+  elseif Ball.x > self.x + self.width then
+    return false
+  else if Ball.x + BALL_SIZE < self.x then
+    return false
+  else 
+    return true
+  end
+end
+end
