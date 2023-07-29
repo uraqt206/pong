@@ -5,8 +5,8 @@ require 'Ball'
 
 state = 'start'
 servingPlayer = 1
-PADDLE_SPEED = 100
-BALL_SPEED = 150
+PADDLE_SPEED = 150
+BALL_SPEED = 200
 BALL_SIZE = 5
 
 function love.load() 
@@ -21,8 +21,9 @@ function love.load()
   math.randomseed(os.time())
   startFont = love.graphics.newFont('font.ttf', 16)
   scoreFont = love.graphics.newFont('font.ttf', 48)
-  Player1 = Paddle(0, 0, 10, 30)
-  Player2 = Paddle(VIRTUE_WIDTH-10, VIRTUE_HEIGHT-30, 10, 30)
+  winFont = love.graphics.newFont('font.ttf', 32)
+  Player1 = Paddle(0, 0, 10, 40)
+  Player2 = Paddle(VIRTUE_WIDTH-10, VIRTUE_HEIGHT-30, 10, 40)
   Player1Point = 0
   Player2Point = 0
   Ball = Ball(VIRTUE_WIDTH/2-2, VIRTUE_HEIGHT/2-2, 0, 0)
@@ -30,13 +31,21 @@ end
 
 function love.keypressed(key) 
   if key == 'return' then
-    if (state == 'serving') then
+    if state == 'serving' then
       state = 'playing'
       if servingPlayer == 1 then
         Ball.dx = BALL_SPEED
+        Ball.dy = math.random(-50, 50)
       else 
         Ball.dx = -BALL_SPEED
+        Ball.dy = math.random(-50, 50)
       end
+    end
+
+    if state == 'winning' then
+      Player1Point = 0
+      Player2Point = 0
+      state = 'serving'
     end
     
     if state == 'start' then
@@ -59,6 +68,11 @@ function Serving()
   love.graphics.setFont(startFont)
   love.graphics.printf('Player ' .. servingPlayer .. ' to serve', 0, VIRTUE_HEIGHT/2+100, VIRTUE_WIDTH, 'center')
   -- love.graphics.printf('Please press enter', 0, VIRTUE_HEIGHT/2+25, VIRTUE_WIDTH, 'center')
+end
+
+function Winning() 
+  love.graphics.setFont(winFont)
+  love.graphics.printf('Player ' .. winPlayer .. ' won!', 0, VIRTUE_HEIGHT/2-100, VIRTUE_WIDTH, 'center')
 end
 
 function love.update(dt) 
@@ -98,6 +112,12 @@ function love.update(dt)
       servingPlayer = 1
       Ball:init(VIRTUE_WIDTH/2-2, VIRTUE_HEIGHT/2-2, 0, 0)
       state = 'serving'
+
+      if Player2Point == 5 then
+        winPlayer = 2
+        servingPlayer = 1
+        state = 'winning'
+      end
     end
 
     if Ball.x > VIRTUE_WIDTH then
@@ -105,9 +125,26 @@ function love.update(dt)
       servingPlayer = 2
       Ball:init(VIRTUE_WIDTH/2-2, VIRTUE_HEIGHT/2-2, 0, 0)
       state = 'serving'
+
+      if Player1Point == 5 then
+        winPlayer = 1
+        servingPlayer = 2
+        state = 'winning'
+      end
+    end
+
+    if Ball.y <= 0 then
+      Ball.dy = -Ball.dy
+      Ball.y = -Ball.dy + -Ball.dy * dt
+    end
+
+    if Ball.y >= VIRTUE_HEIGHT then
+      Ball.dy = -Ball.dy + -Ball.dy * dt
+      Ball.y = VIRTUE_HEIGHT-1
     end
   end
 end
+
 
 function love.draw()
   push:apply('start');
@@ -130,6 +167,10 @@ function love.draw()
   
   if state == 'serving' then
     Serving()
+  end
+
+  if state == 'winning' then
+    Winning()
   end
   
   push:apply('end');

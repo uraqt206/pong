@@ -6,6 +6,7 @@ end
 
 function Ball:move(dt)
   self.x = self.x + self.dx * dt
+  self.y = self.y + self.dy * dt
 end
 
 function Ball:render()
